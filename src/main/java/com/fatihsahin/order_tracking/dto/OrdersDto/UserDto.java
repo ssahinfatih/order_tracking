@@ -1,8 +1,6 @@
 package com.fatihsahin.order_tracking.dto.OrdersDto;
-
-import java.io.Serializable;
-
 public record UserDto(
+        Long id,
         String name,
         String surname) {
 }

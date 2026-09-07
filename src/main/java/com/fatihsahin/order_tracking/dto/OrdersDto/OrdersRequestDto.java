@@ -19,6 +19,8 @@ public record OrdersRequestDto(
         @Min(message = "minimum 1", value = 1)
         @Max(message = "maximum 1000000", value = 1000000)
         BigDecimal totalAmount,
-        PaymentStatus paymentStatus
+        PaymentStatus paymentStatus,
+        UserDto user,
+        ProductDto product
        )  {
 }
