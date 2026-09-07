@@ -8,6 +8,7 @@ import com.fatihsahin.order_tracking.mapper.UserMapper;
 import com.fatihsahin.order_tracking.repository.UserRepository;
 import com.fatihsahin.order_tracking.service.IUserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ public class UserServiceImpl implements IUserService {
         this.userMapper = userMapper;
     }
 
+    @Cacheable(value = "users", key = "#id")
     @Override
     public UserResponseDto getUserById(Long id) {
         log.info("Fetching user by ID: {}", id);
