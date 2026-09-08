@@ -8,7 +8,10 @@ import com.fatihsahin.order_tracking.mapper.UserMapper;
 import com.fatihsahin.order_tracking.repository.UserRepository;
 import com.fatihsahin.order_tracking.service.IUserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,7 +29,7 @@ public class UserServiceImpl implements IUserService {
         this.userMapper = userMapper;
     }
 
-    @Cacheable(value = "users", key = "#id")
+    @Cacheable(value = "users", key = "#id")//cache önbellekten her zaman aynı id ile gelen requestlerde veritabanına gitmeden cacheten veriyi döndürür.
     @Override
     public UserResponseDto getUserById(Long id) {
         log.info("Fetching user by ID: {}", id);
@@ -42,6 +45,8 @@ public class UserServiceImpl implements IUserService {
         return userMapper.toUserResponseDto(savedUser);
     }
 
+    @CacheEvict(value = "users",allEntries = true)//cacheten siler. çünkü update edilen userin idsi değişmiş olabilir ve cachedeki eski veriyi silmek gerekir.
+    @CachePut(value = "users", key = "#id")
     @Override
     public UserResponseDto updateUser(Long id, UserRequestDto userRequestDto) {
         log.info("Updating user with ID: {}", id);
@@ -50,7 +55,10 @@ public class UserServiceImpl implements IUserService {
         User updatedUser = userRepository.save(user);
         return userMapper.toUserResponseDto(updatedUser);
     }
-
+    @Caching(evict = {
+            @CacheEvict(value = "users", key = "#id"),
+            @CacheEvict(value = "userss", allEntries = true)
+    })
     @Override
     public void deleteUser(Long id) {
         log.info("Deleting user with ID: {}", id);
