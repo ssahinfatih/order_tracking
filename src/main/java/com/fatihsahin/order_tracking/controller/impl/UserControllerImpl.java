@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,7 +23,8 @@ public class UserControllerImpl implements IUserController {
 
 
     @Override
-    @GetMapping("/{id}")
+    @GetMapping("/getbyid/{id}")
+    @PreAuthorize("hasRole('ADMIN')") // Sadece ADMIN veya USER rolüne sahip kullanıcılar erişebilir. method seviyesinde yetkilendirme
     public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long id) {
         UserResponseDto userById = userService.getUserById(id);
         return ResponseEntity.ok().body(userById);
