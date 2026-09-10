@@ -1,6 +1,7 @@
 package com.fatihsahin.order_tracking.controller.impl;
 
-import com.fatihsahin.order_tracking.dto.UserLoginRequestDto;
+import com.fatihsahin.order_tracking.dto.*;
+import com.fatihsahin.order_tracking.entities.RefreshToken;
 import com.fatihsahin.order_tracking.entities.UserLogin;
 import com.fatihsahin.order_tracking.security.JwtService;
 import com.fatihsahin.order_tracking.service.UserLoginService;
@@ -11,7 +12,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
+@RequestMapping("/api/v1/auth")
 public class UserLoginController {
 
     private final UserDetailsService userDetailsService;
@@ -49,10 +53,39 @@ public class UserLoginController {
                     .body("Username veya password yanlış");
         }
 
-        String token = jwtService.generateToken(userDetails);
-
-        return ResponseEntity.ok(token);
+        //String token = jwtService.generateToken(userDetails);
+        TokenPair tokenPair= jwtService.generateTokenPair(userDetails);
+        return ResponseEntity.ok(Map.of(
+                "Sonuç","Login Başarılı",
+                "accessToken", tokenPair.accessToken(),
+                "refreshToken", tokenPair.refreshToken(),
+                "User Name", userDetails.getUsername()
+        ));
     }
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshToken(
+            @RequestBody RefreshTokenRequest request) {
+
+        String username = jwtService.refreshAccessToken(request.refreshToken());
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        TokenPair tokenPair= jwtService.generateTokenPair(userDetails);
+
+        return ResponseEntity.ok(Map.of(
+                "Sonuç","Token Yenilendi",
+                "Access Token", tokenPair.accessToken(),
+                "Refresh Token", tokenPair.refreshToken()
+        ));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestBody LogoutRequest request) {
+        String username = jwtService.getUsernameFromToken(request.accessToken());
+        jwtService.revokeAllRefreshTokens(username);
+        return ResponseEntity.ok(Map.of("Sonuç","Logout Başarılı"));
+
+    }
+
     @PostMapping("/register")
     public ResponseEntity<?> register(
             @RequestBody UserLogin userLogin) {

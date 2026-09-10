@@ -42,11 +42,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
 
                                 .requestMatchers(
-                                        "/api/v1/users/getbyid/",
-                                        "/api/v1/users/create",
-                                        "/api/v1/users/update/",
-                                        "/register",
-                                        "/login"
+                                        "/api/v1/auth/login",
+                                        "/api/v1/auth/register",
+                                        "/api/v1/auth/refresh",
+                                        "/api/v1/auth/logout"
                                 ).permitAll()//tüm kullanıcılar erişebilir
 
                                 /*  .requestMatchers("/api/v1/users/update/").hasRole("ADMIN")//sadece admin rolüne sahip kullanıcılar erişebilir
