@@ -7,20 +7,18 @@ import com.fatihsahin.order_tracking.exception.NotFoundException;
 import com.fatihsahin.order_tracking.mapper.OrdersMapper;
 import com.fatihsahin.order_tracking.repository.OrdersRepository;
 import com.fatihsahin.order_tracking.service.IOrdersService;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
+@AllArgsConstructor
 public class OrdersServiceImpl implements IOrdersService {
 
     private final OrdersRepository ordersRepository;
     private final OrdersMapper ordersMapper;
 
-    public OrdersServiceImpl(OrdersRepository ordersRepository, OrdersMapper ordersMapper) {
-        this.ordersRepository = ordersRepository;
-        this.ordersMapper = ordersMapper;
-    }
 
     @Override
     public OrdersResponseDto getOrderById(Long id) {
@@ -35,8 +33,8 @@ public class OrdersServiceImpl implements IOrdersService {
         Orders orders = ordersMapper.toOrders(ordersRequestDto);
 
         Orders savedOrders = ordersRepository.save(orders);
-
-        return ordersMapper.toOrdersResponseDto(savedOrders);
+        OrdersResponseDto ordersRequestDto1 = ordersMapper.toOrdersResponseDto(savedOrders);
+        return ordersRequestDto1;
     }
 
     @Override
